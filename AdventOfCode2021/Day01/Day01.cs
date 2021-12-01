@@ -8,37 +8,23 @@ internal class Day01
 
     public static void Task1and2()
     {
-        //var depths = File.ReadAllLines(inputPath);
-        List<int> depths = new List<int>();
-        int countIncr = 0;
-        int countSumIncr = 0;
+        List<int> depths = File.ReadAllLines(inputPath).ToList().ConvertAll(n => int.Parse(n.Trim()));
 
-        using (StreamReader reader = new StreamReader(inputPath))
+        Console.WriteLine($"Task 1: {CountIncrements(depths, 1)}");
+        Console.WriteLine($"Task 2: {CountIncrements(depths, 3)}");
+    }
+
+    private static int CountIncrements(List<int> depths, int compareIdx)
+    {
+        int count = 0;
+        for (int i = 0; i < depths.Count - compareIdx; i++)
         {
-            string line;
-            while((line = reader.ReadLine()) != null)
+            if (depths[i] < depths[i + compareIdx])
             {
-                depths.Add(int.Parse(line));
+                count++;
             }
         }
 
-        for (int i = 0; i < depths.Count - 1; i++)
-        {
-            if (depths[i] < depths[i + 1])
-            {
-                countIncr++;
-            }
-        }
-
-        for (int i = 0; i < depths.Count - 3; i++)
-        {
-            if (depths[i] + depths[i+1] + depths[i+2] < depths[i + 1] + depths[i + 2] + depths[i + 3])
-            {
-                countSumIncr++;
-            }
-        }
-
-        Console.WriteLine($"Task 1: {countIncr}");
-        Console.WriteLine($"Task 2: {countSumIncr}");
+        return count;
     }
 }
