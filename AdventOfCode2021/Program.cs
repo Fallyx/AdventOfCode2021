@@ -50,6 +50,13 @@ class Program
         Console.WriteLine($"Day 01 elapsed time: {swDay.Elapsed}\n");
         #endregion
 
+        #region day 01
+        swDay.Start();
+        Day02.Day02.Task1and2();
+        swDay.Stop();
+        Console.WriteLine($"Day 02 elapsed time: {swDay.Elapsed}\n");
+        #endregion
+
         swTot.Stop();
         Console.WriteLine($"\nTotal elapsed time: {swTot.Elapsed}\n");
     }
@@ -62,6 +69,9 @@ class Program
         {
             case 1:
                 Day01.Day01.Task1and2();
+                break;
+            case 2:
+                Day02.Day02.Task1and2();
                 break;
             default:
                 break;
