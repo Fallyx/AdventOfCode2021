@@ -6,7 +6,6 @@ namespace AdventOfCode2021;
 
 class Program
 {
-    private static Stopwatch swTot = new Stopwatch();
     private static Stopwatch swDay = new Stopwatch();
 
     static void Main(string[] args)
@@ -18,18 +17,12 @@ class Program
         }
         else
         {
-            Console.WriteLine("Run a single day [1-25] or [a]ll:");
+            Console.WriteLine("Run a day [1-25]:");
             input = Console.ReadLine();
             Console.WriteLine("---------------------------------\n");
         }
 
-        if (input == "a")
-        {
-            FullRun();
-        }
-
-        int day;
-        bool success = int.TryParse(input, out day);
+        bool success = int.TryParse(input, out int day);
 
         if (!success)
         {
@@ -37,36 +30,6 @@ class Program
         }
 
         SingleRun(day);
-    }
-
-    private static void FullRun()
-    {
-        swTot.Start();
-
-        #region day 01
-        swDay.Start();
-        Day01.Day01.Task1and2();
-        swDay.Stop();
-        Console.WriteLine($"Day 01 elapsed time: {swDay.Elapsed}\n");
-        #endregion
-
-        #region day 02
-        swDay.Start();
-        Day02.Day02.Task1and2();
-        swDay.Stop();
-        Console.WriteLine($"Day 02 elapsed time: {swDay.Elapsed}\n");
-        #endregion
-
-        #region day 03
-        swDay.Start();
-        Day03.Day03.Task1();
-        Day03.Day03.Task2();
-        swDay.Stop();
-        Console.WriteLine($"Day 03 elapsed time: {swDay.Elapsed}\n");
-        #endregion
-
-        swTot.Stop();
-        Console.WriteLine($"\nTotal elapsed time: {swTot.Elapsed}\n");
     }
 
     private static void SingleRun(int day)
@@ -84,6 +47,9 @@ class Program
             case 3:
                 Day03.Day03.Task1();
                 Day03.Day03.Task2();
+                break;
+            case 4:
+                Day04.Day04.Task1and2();
                 break;
             default:
                 break;
