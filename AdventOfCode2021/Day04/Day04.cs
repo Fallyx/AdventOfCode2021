@@ -1,5 +1,4 @@
-﻿
-namespace AdventOfCode2021.Day04;
+﻿namespace AdventOfCode2021.Day04;
 
 internal class Day04
 {
@@ -10,31 +9,31 @@ internal class Day04
         List<string> lines = File.ReadAllLines(inputPath).ToList();        
         List<int> pullingNums = lines.First().Split(',').Select(Int32.Parse).ToList();
         List<BingoBoard> boards = CreateBoards(lines);
-        bool firstWinFound = false;
+        bool firstBingoFound = false;
 
         foreach(int num in pullingNums)
         {
-            for(int boardNum = boards.Count - 1; boardNum > 0; boardNum--)
+            for(int boardNum = boards.Count - 1; boardNum >= 0; boardNum--)
             {
-                for (int y = 0; y < 5; y++)
+                for (int y = 0; y < boards[boardNum].Rows; y++)
                 {
-                    for (int x = 0; x < 5; x++)
+                    for (int x = 0; x < boards[boardNum].Cols; x++)
                     {
-                        if (boards[boardNum].GetBoardNum(y, x) == num)
+                        if (boards[boardNum].Board[y, x].num == num)
                         {
-                            boards[boardNum].SetBoardMark(y, x, true);
+                            boards[boardNum].Board[y, x].mark = true;
                         }
                     }
                 }
 
-                if (boards[boardNum].HasWin())
+                if (boards[boardNum].HasBingo())
                 {
-                    if (!firstWinFound)
+                    if (!firstBingoFound)
                     {
                         Console.WriteLine($"Task 1: {boards[boardNum].SumOfUnmarked() * num}");
-                        firstWinFound = true;
+                        firstBingoFound = true;
                     }
-                    else if (boards.Count == 2) // Correct answer when 2 boards left???
+                    else if (boards.Count == 1)
                     {
                         Console.WriteLine($"Task 2: {boards[boardNum].SumOfUnmarked() * num}");
                         return;
@@ -46,28 +45,28 @@ internal class Day04
         }
     }
 
-    private static List<BingoBoard> CreateBoards(List<string> lines)
+    private static List<BingoBoard> CreateBoards(List<string> lines, int boardSize = 5)
     {
         List<BingoBoard> boards = new List<BingoBoard>();
         lines = lines.Skip(2).ToList();
         int y = 0;
 
-        BingoBoard board = new BingoBoard(5, 5);
+        BingoBoard board = new BingoBoard(boardSize, boardSize);
         foreach (string line in lines)
         {
             if (line == string.Empty)
             {
                 boards.Add(board);
                 y = 0;
-                board = new BingoBoard(5, 5);
+                board = new BingoBoard(boardSize, boardSize);
                 continue;
             }
 
             int[] rowNums = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToArray();
-            for (int x = 0; x < 5; x++)
+            for (int x = 0; x < boardSize; x++)
             {
-                board.SetBoardNum(y, x, rowNums[x]);
-                board.SetBoardMark(y, x, false);
+                board.Board[y, x].num = rowNums[x];
+                board.Board[y, x].mark = false;
             }
             y++;
         }
@@ -82,34 +81,14 @@ internal class BingoBoard
     public (int num, bool mark)[,] Board { get; private set; }
     public int Rows { get; private set; }
     public int Cols { get; private set; }
-    public bool Win { get; private set; }
+    public bool Bingo { get; private set; }
 
     public BingoBoard(int rows, int cols)
     {
-        Win = false;
+        Bingo = false;
         Rows = rows;
         Cols = cols; 
         Board = new (int num, bool mark)[Rows, Cols];
-    }
-
-    public int GetBoardNum(int row, int col)
-    {
-        return Board[row, col].num;
-    }
-
-    public bool GetBoardMark(int row, int col)
-    {
-        return Board[row, col].mark;
-    }
-
-    public void SetBoardNum(int row, int col, int num)
-    {
-        Board[row, col].num = num;
-    }
-
-    public void SetBoardMark(int row, int col, bool mark)
-    {
-        Board[row, col].mark = mark;
     }
 
     public int SumOfUnmarked()
@@ -126,14 +105,14 @@ internal class BingoBoard
         return sum;
     }
 
-    public bool HasWin()
+    public bool HasBingo()
     {
         for (int row = 0; row < Rows; row++)
         {
             if (Board[row, 0].mark && Board[row, 1].mark && Board[row, 2].mark && Board[row, 3].mark && Board[row, 4].mark)
             {
-                Win = true;
-                return Win;
+                Bingo = true;
+                return Bingo;
             }
         }
 
@@ -141,11 +120,11 @@ internal class BingoBoard
         {
             if (Board[0, col].mark && Board[1, col].mark && Board[2, col].mark && Board[3, col].mark && Board[4, col].mark)
             {
-                Win = true;
-                return Win;
+                Bingo = true;
+                return Bingo;
             }
         }
 
-        return Win;
+        return Bingo;
     }
 }

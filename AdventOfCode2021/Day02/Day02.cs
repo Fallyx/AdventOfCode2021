@@ -1,5 +1,4 @@
-﻿
-namespace AdventOfCode2021.Day02;
+﻿namespace AdventOfCode2021.Day02;
 
 internal class Day02
 {
