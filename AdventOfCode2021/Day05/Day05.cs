@@ -52,11 +52,7 @@ internal class Day05
 
     private static void AddVent(Dictionary<(int x, int y), int> ventLines, int x, int y)
     {
-        if (!ventLines.ContainsKey((x, y)))
-        {
-            ventLines.Add((x, y), 1);
-        }
-        else
+        if(!ventLines.TryAdd((x,y), 1))
         {
             ventLines[(x, y)]++;
         }
