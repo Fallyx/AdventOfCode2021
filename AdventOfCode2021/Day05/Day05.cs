@@ -4,7 +4,7 @@ internal class Day05
 {
     const string inputPath = @"Day05/Input.txt";
 
-    public static void Task1()
+    public static void Task1and2()
     {
         Dictionary<(int x, int y), int> ventLinesTask1 = new Dictionary<(int x, int y), int>();
         Dictionary<(int x, int y), int> ventLinesTask2 = new Dictionary<(int x, int y), int>();
