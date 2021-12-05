@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace AdventOfCode2021.Day05;
+﻿namespace AdventOfCode2021.Day05;
 
 internal class Day05
 {
@@ -10,43 +8,26 @@ internal class Day05
     {
         Dictionary<(int x, int y), int> ventLinesTask1 = new Dictionary<(int x, int y), int>();
         Dictionary<(int x, int y), int> ventLinesTask2 = new Dictionary<(int x, int y), int>();
+        List<string> lines = File.ReadAllLines(inputPath).ToList();
 
-        using (StreamReader reader = new StreamReader(inputPath))
+        foreach (string line in lines)
         {
-            string line;
-            while((line = reader.ReadLine()) != null)
+            string[] ventCoords = line.Split(" -> ");
+            int[] ventCoordsStart = ventCoords[0].Split(',').Select(Int32.Parse).ToArray();
+            int[] ventCoordsEnd = ventCoords[1].Split(',').Select(Int32.Parse).ToArray();
+            int length = Math.Max(Math.Abs(ventCoordsStart[0] - ventCoordsEnd[0]), Math.Abs(ventCoordsStart[1] - ventCoordsEnd[1]));
+
+            for (int i = 0; i <= length; i++)
             {
-                string[] ventCoords = line.Split(" -> ");
-                int[] ventCoordsStart = ventCoords[0].Split(',').Select(Int32.Parse).ToArray();
-                int[] ventCoordsEnd = ventCoords[1].Split(',').Select(Int32.Parse).ToArray();
+                int x = (ventCoordsStart[0] < ventCoordsEnd[0]) ? ventCoordsStart[0] + i : ((ventCoordsStart[0] > ventCoordsEnd[0]) ? ventCoordsStart[0] - i : ventCoordsStart[0]);
+                int y = (ventCoordsStart[1] < ventCoordsEnd[1]) ? ventCoordsStart[1] + i : ((ventCoordsStart[1] > ventCoordsEnd[1]) ? ventCoordsStart[1] - i : ventCoordsStart[1]);
 
-                int length = Math.Max(Math.Abs(ventCoordsStart[0] - ventCoordsEnd[0]), Math.Abs(ventCoordsStart[1] - ventCoordsEnd[1]));
-                for (int i = 0; i <= length; i++)
+                if (ventCoordsStart[0] == ventCoordsEnd[0] || ventCoordsStart[1] == ventCoordsEnd[1])
                 {
-                    int x = (ventCoordsStart[0] < ventCoordsEnd[0]) ? ventCoordsStart[0] + i : ((ventCoordsStart[0] > ventCoordsEnd[0]) ? ventCoordsStart[0] - i : ventCoordsStart[0]);
-                    int y = (ventCoordsStart[1] < ventCoordsEnd[1]) ? ventCoordsStart[1] + i : ((ventCoordsStart[1] > ventCoordsEnd[1]) ? ventCoordsStart[1] - i : ventCoordsStart[1]);
-
-                    if (ventCoordsStart[0] == ventCoordsEnd[0] || ventCoordsStart[1] == ventCoordsEnd[1])
-                    {
-                        if (!ventLinesTask1.ContainsKey((x, y)))
-                        {
-                            ventLinesTask1.Add((x, y), 1);
-                        }
-                        else
-                        {
-                            ventLinesTask1[(x, y)]++;
-                        }
-                    }
-
-                    if (!ventLinesTask2.ContainsKey((x, y)))
-                    {
-                        ventLinesTask2.Add((x, y), 1);
-                    }
-                    else
-                    {
-                        ventLinesTask2[(x, y)]++;
-                    }
+                    AddVent(ventLinesTask1, x, y);
                 }
+
+                AddVent(ventLinesTask2, x, y);
             }
         }
 
@@ -67,5 +48,17 @@ internal class Day05
         }
 
         Console.WriteLine($"Task 2: {twoOrMore}");
+    }
+
+    private static void AddVent(Dictionary<(int x, int y), int> ventLines, int x, int y)
+    {
+        if (!ventLines.ContainsKey((x, y)))
+        {
+            ventLines.Add((x, y), 1);
+        }
+        else
+        {
+            ventLines[(x, y)]++;
+        }
     }
 }
