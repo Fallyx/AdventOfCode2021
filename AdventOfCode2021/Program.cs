@@ -55,6 +55,10 @@ class Program
             case 6:
                 Day06.Day06.Task1and2();
                 break;
+            case 7:
+                Day07.Day07.Task1();
+                Day07.Day07.Task2();
+                break;
             default:
                 break;
         }
