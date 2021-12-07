@@ -1,5 +1,4 @@
-﻿
-namespace AdventOfCode2021.Day07;
+﻿namespace AdventOfCode2021.Day07;
 
 internal class Day07
 {
@@ -9,7 +8,6 @@ internal class Day07
     {
         List<int> crabs = File.ReadAllLines(inputPath).First().Split(',').Select(Int32.Parse).ToList();
         crabs.Sort();
-
         int mid = crabs.Count / 2;
         int median = ((crabs.Count % 2) != 0) ? crabs[mid] : (crabs[mid - 1] + crabs[mid]) / 2;
 
@@ -22,7 +20,6 @@ internal class Day07
         List<int> crabs = File.ReadAllLines(inputPath).First().Split(',').Select(Int32.Parse).ToList();
         crabs.Sort();
         int lowestFuelUsed = int.MaxValue;
-
         int meanFloor = crabs.Sum() / crabs.Count;
         int meanCeiling = (crabs.Sum() / crabs.Count + 1);
         
