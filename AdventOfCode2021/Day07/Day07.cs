@@ -22,8 +22,11 @@ internal class Day07
         List<int> crabs = File.ReadAllLines(inputPath).First().Split(',').Select(Int32.Parse).ToList();
         crabs.Sort();
         int lowestFuelUsed = int.MaxValue;
+
+        int meanFloor = crabs.Sum() / crabs.Count;
+        int meanCeiling = (crabs.Sum() / crabs.Count + 1);
         
-        for(int moves = 0; moves < crabs.Last(); moves++)
+        for(int moves = meanFloor; moves < meanCeiling; moves++)
         {
             int fuelUsed = 0;
             for (int i = 0; i < crabs.Count; i++)
