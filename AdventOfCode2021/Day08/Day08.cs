@@ -7,7 +7,6 @@ internal class Day08
     public static void Task1()
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
-
         int counter1478 = 0;
 
         foreach (string line in lines)
@@ -28,7 +27,6 @@ internal class Day08
     public static void Task2()
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
-
         int outputValueSum = 0;
 
         foreach(string line in lines)
@@ -55,35 +53,20 @@ internal class Day08
             // Identify nums with 5 segments
             foreach(string num in fiveSegments)
             {
-                if (num.Contains(orderedNums[1][0]) && num.Contains(orderedNums[1][1]))
-                {
-                    orderedNums[3] = num;
-                }
-                else if (IsTwo(orderedNums[4], num))
-                {
-                    orderedNums[2] = num;
-                }
-                else
-                {
-                    orderedNums[5] = num;
-                }
+                if (num.Contains(orderedNums[1][0]) && num.Contains(orderedNums[1][1])) orderedNums[3] = num;
+                else if (IsTwoOrSix(orderedNums[4], num, 2)) orderedNums[2] = num;
+                else orderedNums[5] = num;
             }
 
             // Identify nums with 6 segments
             foreach(string num in sixSegments)
             {
-                if (num.Contains(orderedNums[4][0]) && num.Contains(orderedNums[4][1]) && num.Contains(orderedNums[4][2]) && num.Contains(orderedNums[4][3]))
-                {
+                if (num.Contains(orderedNums[4][0]) && num.Contains(orderedNums[4][1]) && num.Contains(orderedNums[4][2]) && num.Contains(orderedNums[4][3])) 
                     orderedNums[9] = num;
-                }
-                else if (IsSix(orderedNums[1], num))
-                {
+                else if (IsTwoOrSix(orderedNums[1], num, 1)) 
                     orderedNums[6] = num;
-                }
-                else
-                {
+                else 
                     orderedNums[0] = num;
-                }
             }
 
             outputValueSum += DecodeOutputValue(orderedNums, outputValues);
@@ -92,28 +75,17 @@ internal class Day08
         Console.WriteLine($"Task 2: {outputValueSum}");
     }
 
-    private static bool IsTwo(string four, string num)
+    // containsConstraint = 2 -> is two | = 1 -> is six
+    private static bool IsTwoOrSix(string fourSix, string num, int containsConstraint)
     {
         int containsCounter = 0;
 
-        foreach(char c in four)
+        foreach(char c in fourSix)
         {
             if (num.Contains(c)) containsCounter++;
         }
 
-        return (containsCounter == 2);
-    }
-
-    private static bool IsSix(string six, string num)
-    {
-        int containsCounter = 0;
-
-        foreach (char c in six)
-        {
-            if (num.Contains(c)) containsCounter++;
-        }
-
-        return (containsCounter == 1);
+        return (containsCounter == containsConstraint);
     }
 
     private static int DecodeOutputValue(string[] orderedNums, string[] outputValues)
