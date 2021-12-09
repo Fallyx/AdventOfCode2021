@@ -3,8 +3,6 @@
 internal class Day09
 {
     const string inputPath = @"Day09/Input.txt";
-    private static int yLength = 0;
-    private static int xLength = 0;
 
     public static void Task1()
     {
@@ -40,26 +38,24 @@ internal class Day09
     public static void Task2()
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
-        yLength = lines.Count;
-        xLength = lines[0].Length;
-        Dictionary<(int y, int x), bool> heightMap = new Dictionary<(int y, int x), bool>();
+        bool[,] heightMap = new bool[lines.Count, lines[0].Length];
         List<int> basinSizes = new List<int>();
 
-        for (int y = 0; y < yLength; y++)
+        for (int y = 0; y < heightMap.GetLength(0); y++)
         {
-            for (int x = 0; x < xLength; x++)
+            for (int x = 0; x < heightMap.GetLength(1); x++)
             {
-                heightMap.Add((y, x), (Int32.Parse(lines[y][x].ToString()) == 9));
+                heightMap[y, x] = Int32.Parse(lines[y][x].ToString()) == 9;
             }
         }
 
-        for (int y = 0; y < yLength; y++)
+        for (int y = 0; y < heightMap.GetLength(0); y++)
         {
-            for (int x = 0; x < xLength; x++)
+            for (int x = 0; x < heightMap.GetLength(1); x++)
             {
-                if (!heightMap[(y, x)])
+                if (!heightMap[y, x])
                 {
-                    heightMap[(y, x)] = true;
+                    heightMap[y, x] = true;
                     int basinSize = CalculateBasinSize(heightMap, y, x);
                     basinSizes.Add(basinSize);
                 }
@@ -69,18 +65,18 @@ internal class Day09
          Console.WriteLine($"Task 2: {basinSizes.OrderByDescending(n => n).Take(3).Aggregate(1, (tot, next) => tot * next)}");
     }
 
-    private static int CalculateBasinSize(Dictionary<(int y, int x), bool> heightMap, int y, int x)
+    private static int CalculateBasinSize(bool[,] heightMap, int y, int x)
     {
         int basinSize = 1;
-        heightMap[(y, x)] = true;
+        heightMap[y, x] = true;
 
-        if (y != 0 && !heightMap[(y - 1, x)])
+        if (y != 0 && !heightMap[y - 1, x])
             basinSize += CalculateBasinSize(heightMap, y - 1, x);
-        if (y != yLength - 1 && !heightMap[(y + 1, x)])
+        if (y != heightMap.GetLength(0) - 1 && !heightMap[y + 1, x])
             basinSize += CalculateBasinSize(heightMap, y + 1, x);
-        if (x != 0 && !heightMap[(y, x - 1)])
+        if (x != 0 && !heightMap[y, x - 1])
             basinSize += CalculateBasinSize(heightMap, y, x - 1);
-        if (x != xLength - 1 && !heightMap[(y, x + 1)])
+        if (x != heightMap.GetLength(1) - 1 && !heightMap[y, x + 1])
             basinSize += CalculateBasinSize(heightMap, y, x + 1);
 
         return basinSize;
