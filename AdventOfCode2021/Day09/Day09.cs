@@ -10,6 +10,7 @@ internal class Day09
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
         int[,] heightMap = new int[lines.Count, lines[0].Length];
+        List<int> lowPoints = new List<int>();
 
         for (int y = 0; y < lines.Count; y++)
         {
@@ -18,7 +19,6 @@ internal class Day09
                 heightMap[y,x] = Int32.Parse(lines[y][x].ToString());
             }
         }
-        List<int> lowPoints = new List<int>();
         
         for(int y = 0; y < heightMap.GetLength(0); y++)
         {
@@ -40,17 +40,16 @@ internal class Day09
     public static void Task2()
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
-        Dictionary<(int y, int x), (int height, bool marked)> heightMap = new Dictionary<(int y, int x), (int height, bool marked)>();
         yLength = lines.Count;
         xLength = lines[0].Length;
+        Dictionary<(int y, int x), bool> heightMap = new Dictionary<(int y, int x), bool>();
         List<int> basinSizes = new List<int>();
 
         for (int y = 0; y < yLength; y++)
         {
             for (int x = 0; x < xLength; x++)
             {
-                int num = Int32.Parse(lines[y][x].ToString());
-                heightMap.Add((y, x), (num, num == 9));
+                heightMap.Add((y, x), (Int32.Parse(lines[y][x].ToString()) == 9));
             }
         }
 
@@ -58,34 +57,30 @@ internal class Day09
         {
             for (int x = 0; x < xLength; x++)
             {
-                if (heightMap[(y, x)].height != 9 && heightMap[(y, x)].marked == false)
+                if (!heightMap[(y, x)])
                 {
-                    heightMap[(y, x)] = (heightMap[(y, x)].height, true);
+                    heightMap[(y, x)] = true;
                     int basinSize = CalculateBasinSize(heightMap, y, x);
                     basinSizes.Add(basinSize);
                 }
             }
         }
 
-
          Console.WriteLine($"Task 2: {basinSizes.OrderByDescending(n => n).Take(3).Aggregate(1, (tot, next) => tot * next)}");
     }
 
-    private static int CalculateBasinSize(Dictionary<(int y, int x), (int height, bool marked)> heightMap, int y, int x)
+    private static int CalculateBasinSize(Dictionary<(int y, int x), bool> heightMap, int y, int x)
     {
         int basinSize = 1;
-        heightMap[(y, x)] = (heightMap[(y, x)].height , true);
+        heightMap[(y, x)] = true;
 
-        if (y != 0 && heightMap[(y - 1, x)].height != 9 && heightMap[(y - 1, x)].marked == false)
+        if (y != 0 && !heightMap[(y - 1, x)])
             basinSize += CalculateBasinSize(heightMap, y - 1, x);
-
-        if (y != yLength - 1 && heightMap[(y + 1, x)].height != 9 && heightMap[(y + 1, x)].marked == false)
+        if (y != yLength - 1 && !heightMap[(y + 1, x)])
             basinSize += CalculateBasinSize(heightMap, y + 1, x);
-
-        if (x != 0 && heightMap[(y, x - 1)].height != 9 && heightMap[(y, x - 1)].marked == false)
+        if (x != 0 && !heightMap[(y, x - 1)])
             basinSize += CalculateBasinSize(heightMap, y, x - 1);
-
-        if (x != xLength - 1 && heightMap[(y, x + 1)].height != 9 && heightMap[(y, x + 1)].marked == false)
+        if (x != xLength - 1 && !heightMap[(y, x + 1)])
             basinSize += CalculateBasinSize(heightMap, y, x + 1);
 
         return basinSize;
