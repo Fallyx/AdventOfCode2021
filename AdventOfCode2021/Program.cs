@@ -67,6 +67,9 @@ class Program
                 Day09.Day09.Task1();
                 Day09.Day09.Task2();
                 break;
+            case 10:
+                Day10.Day10.Task1and2();
+                break;
             default:
                 break;
         }
