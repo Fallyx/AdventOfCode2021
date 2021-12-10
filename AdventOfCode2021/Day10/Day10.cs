@@ -11,11 +11,11 @@ internal class Day10
         corruptedScore.Add('}', ('{', 1197));
         corruptedScore.Add('>', ('<', 25137));
 
-        Dictionary<char, int> autocompleteScore = new Dictionary<char, int>();
-        autocompleteScore.Add('(', 1);
-        autocompleteScore.Add('[', 2);
-        autocompleteScore.Add('{', 3);
-        autocompleteScore.Add('<', 4);
+        Dictionary<char, int> incompleteScore = new Dictionary<char, int>();
+        incompleteScore.Add('(', 1);
+        incompleteScore.Add('[', 2);
+        incompleteScore.Add('{', 3);
+        incompleteScore.Add('<', 4);
 
         List<string> lines = File.ReadAllLines(inputPath).ToList();
         int errorScore = 0;
@@ -26,9 +26,9 @@ internal class Day10
         {
             foreach(char c in lines[i])
             {
-                if (c == '(' || c == '[' || c == '{' || c == '<')
+                if (incompleteScore.ContainsKey(c))
                     chunk.Push(c);
-                else if (c == ')' || c == ']' || c == '}' || c == '>')
+                else if (corruptedScore.ContainsKey(c))
                 {
                     char openChunk = chunk.Pop();
                     if (openChunk != corruptedScore[c].pair)
@@ -48,9 +48,9 @@ internal class Day10
         {
             foreach (char c in line)
             {
-                if (c == '(' || c == '[' || c == '{' || c == '<')
+                if (incompleteScore.ContainsKey(c))
                     chunk.Push(c);
-                else if (c == ')' || c == ']' || c == '}' || c == '>')
+                else if (corruptedScore.ContainsKey(c))
                     chunk.Pop();
             }
 
@@ -58,14 +58,12 @@ internal class Day10
             while(chunk.Count > 0)
             {
                 char openChunk = chunk.Pop();
-                score = score * 5L + autocompleteScore[openChunk];
+                score = score * 5L + incompleteScore[openChunk];
             }
 
             autocompleteScores.Add(score);
         }
-
         autocompleteScores.Sort();
-
         Console.WriteLine($"Task 2: {autocompleteScores[autocompleteScores.Count / 2]}");
     }
 }
