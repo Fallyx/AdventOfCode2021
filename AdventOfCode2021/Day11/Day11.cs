@@ -128,12 +128,13 @@ internal class Day11
 
     struct DumboOctopus
     {
+        public int EnergyLevel { get; set; }
+        public bool HasFlashed { get; set; }
+
         public DumboOctopus(int energyLevel)
         {
             EnergyLevel = energyLevel;
             HasFlashed = false;
         }
-        public int EnergyLevel { get; set; }
-        public bool HasFlashed { get; set; } 
     }
 }

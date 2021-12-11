@@ -5,65 +5,71 @@ internal class Day10
 
     public static void Task1and2()
     {
-        Dictionary<char,(char pair, int score)> corruptedScore = new Dictionary<char, (char, int)>();
-        corruptedScore.Add(')', ('(', 3));
-        corruptedScore.Add(']', ('[', 57));
-        corruptedScore.Add('}', ('{', 1197));
-        corruptedScore.Add('>', ('<', 25137));
-
-        Dictionary<char, int> incompleteScore = new Dictionary<char, int>();
-        incompleteScore.Add('(', 1);
-        incompleteScore.Add('[', 2);
-        incompleteScore.Add('{', 3);
-        incompleteScore.Add('<', 4);
+        Chunk[] chunkValues = new Chunk[]
+        {
+            new Chunk('(', ')', 3, 1),
+            new Chunk('[', ']', 57, 2),
+            new Chunk('{', '}', 1197, 3),
+            new Chunk('<', '>', 25137, 4)
+        };
 
         List<string> lines = File.ReadAllLines(inputPath).ToList();
         int errorScore = 0;
+        bool isCorruptLine = false;
         List<long>autocompleteScores = new List<long>();
         Stack<char> chunk = new Stack<char>();
 
-        for (int i = lines.Count - 1; i >= 0; i--)
+        foreach(string line in lines)
         {
-            foreach(char c in lines[i])
+            foreach(char c in line)
             {
-                if (incompleteScore.ContainsKey(c))
+                if (chunkValues.Any(v => v.OpenChunk == c))
                     chunk.Push(c);
-                else if (corruptedScore.ContainsKey(c))
+                else if (chunkValues.Any(v => v.CloseChunk == c))
                 {
+                    Chunk foundChunk = chunkValues.First(v => v.CloseChunk == c);
                     char openChunk = chunk.Pop();
-                    if (openChunk != corruptedScore[c].pair)
+                    if (openChunk != foundChunk.OpenChunk)
                     {
-                        errorScore += corruptedScore[c].score;
-                        lines.RemoveAt(i);
+                        errorScore += foundChunk.CorruptedScore;
+                        isCorruptLine = true;
                         break;
                     }
                 }
             }
+
+            if(!isCorruptLine)
+            {
+                long score = 0;
+                while (chunk.Count > 0)
+                {
+                    char openChunk = chunk.Pop();
+                    score = score * 5L + chunkValues.First(v => v.OpenChunk == openChunk).AutocompleteScore;
+                }
+                autocompleteScores.Add(score);
+            }
+            isCorruptLine = false;
             chunk.Clear();
         }
 
         Console.WriteLine($"Task 1: {errorScore}");
-
-        foreach(string line in lines)
-        {
-            foreach (char c in line)
-            {
-                if (incompleteScore.ContainsKey(c))
-                    chunk.Push(c);
-                else if (corruptedScore.ContainsKey(c))
-                    chunk.Pop();
-            }
-
-            long score = 0;
-            while(chunk.Count > 0)
-            {
-                char openChunk = chunk.Pop();
-                score = score * 5L + incompleteScore[openChunk];
-            }
-
-            autocompleteScores.Add(score);
-        }
         autocompleteScores.Sort();
         Console.WriteLine($"Task 2: {autocompleteScores[autocompleteScores.Count / 2]}");
+    }
+
+    struct Chunk
+    {
+        public char OpenChunk { get; set; }
+        public char CloseChunk { get; set; }
+        public int CorruptedScore { get; set; }
+        public int AutocompleteScore { get; set; }
+
+        public Chunk(char open, char close, int corruptedScore, int autocompleteScore)
+        {
+            OpenChunk = open;
+            CloseChunk = close;
+            CorruptedScore = corruptedScore;
+            AutocompleteScore = autocompleteScore;
+        }
     }
 }
