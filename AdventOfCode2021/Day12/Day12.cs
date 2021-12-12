@@ -20,45 +20,23 @@ internal class Day12
                 links[link[1]].Add(link[0]);
         }
 
-        List<string> paths = new List<string>();
-        GetPath(links, "start", "start", paths);
-        Console.WriteLine($"Task 1: {paths.Count}");
+        List<string> pathsTask1 = new List<string>();
+        GetPath(links, "start", "start", pathsTask1);
+        Console.WriteLine($"Task 1: {pathsTask1.Count}");
 
-        List<string> paths2 = new List<string>();
-
+        List<string> pathsTask2 = new List<string>();
         foreach(string key in links.Keys)
         {
             if (key != "start" && key != "end" && key.Any(char.IsLower))
             {
-                GetPathTask2(links, "start", "start", paths2, key);
+                GetPath(links, "start", "start", pathsTask2, key);
             } 
         }
 
-        Console.WriteLine($"Task 2: {paths2.Distinct().Count()}");
+        Console.WriteLine($"Task 2: {pathsTask2.Distinct().Count()}");
     }
 
-    private static void GetPath(Dictionary<string, List<string>> links, string key, string currentPath, List<string> pathsToEnd)
-    {
-        for(int i = 0; i < links[key].Count; i++)
-        {
-            string cave = links[key][i];
-            if (cave == "end")
-            {
-                pathsToEnd.Add(currentPath + $",{cave}");
-            }
-            else if (cave.Any(char.IsLower))
-            {
-                if (!currentPath.Contains(cave))
-                    GetPath(links, cave, $"{currentPath},{cave}", pathsToEnd);
-            }
-            else
-            {
-                GetPath(links, cave, $"{currentPath},{cave}", pathsToEnd);
-            }
-        }
-    }
-
-    private static void GetPathTask2(Dictionary<string, List<string>> links, string key, string currentPath, List<string> pathsToEnd, string smallCaveTwice)
+    private static void GetPath(Dictionary<string, List<string>> links, string key, string currentPath, List<string> pathsToEnd, string smallCaveTwice = "")
     {
         for (int i = 0; i < links[key].Count; i++)
         {
@@ -67,18 +45,18 @@ internal class Day12
             {
                 pathsToEnd.Add(currentPath + $",{cave}");
             }
-            else if (cave == smallCaveTwice && Regex.Matches(currentPath, cave).Count == 1)
+            else if (smallCaveTwice != "" && cave == smallCaveTwice && Regex.Matches(currentPath, cave).Count == 1)
             { 
-                    GetPathTask2(links, cave, $"{currentPath},{cave}", pathsToEnd, smallCaveTwice);
+                GetPath(links, cave, $"{currentPath},{cave}", pathsToEnd, smallCaveTwice);
             }
             else if (cave.Any(char.IsLower))
             {
                 if (!currentPath.Contains(cave))
-                    GetPathTask2(links, cave, $"{currentPath},{cave}", pathsToEnd, smallCaveTwice);
+                    GetPath(links, cave, $"{currentPath},{cave}", pathsToEnd, smallCaveTwice);
             }
             else
             {
-                GetPathTask2(links, cave, $"{currentPath},{cave}", pathsToEnd, smallCaveTwice);
+                GetPath(links, cave, $"{currentPath},{cave}", pathsToEnd, smallCaveTwice);
             }
         }
     }
