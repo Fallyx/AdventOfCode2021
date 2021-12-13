@@ -78,7 +78,7 @@ class Program
                 Day12.Day12.Task1();
                 break;
             case 13:
-                Day13.Day13.Task1();
+                Day13.Day13.Task1and2();
                 break;
             default:
                 break;

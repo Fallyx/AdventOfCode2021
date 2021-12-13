@@ -3,7 +3,7 @@ internal class Day13
 {
     const string inputPath = @"Day13/Input.txt";
 
-    public static void Task1()
+    public static void Task1and2()
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
         List<(int x, int y)> coordinates = new List<(int x, int y)>();
