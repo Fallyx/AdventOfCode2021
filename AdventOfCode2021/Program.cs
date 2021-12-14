@@ -8,7 +8,7 @@ class Program
 
     static void Main(string[] args)
     {
-        string input;
+        string? input;
         if (args.Length != 0)
         {
             input = args[0];
@@ -79,6 +79,10 @@ class Program
                 break;
             case 13:
                 Day13.Day13.Task1and2();
+                break;
+            case 14:
+                Day14.Day14.Task1();
+                Day14.Day14.Task2();
                 break;
             default:
                 break;
