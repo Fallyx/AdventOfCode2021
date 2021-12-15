@@ -55,15 +55,17 @@ internal class Day15
 
     private static int ShortestPath(Dictionary<(int y, int x), CaveNode> nodes, (int X, int Y) target)
     {
-        Queue<CaveNode> queue = new Queue<CaveNode>();
+        PriorityQueue<CaveNode, int> queue = new PriorityQueue<CaveNode, int>();
         HashSet<CaveNode> visited = new HashSet<CaveNode>();
-
-        queue.Enqueue(nodes[(0, 0)]);
+        queue.Enqueue(nodes[(0, 0)], nodes[(0,0)].DistanceFromStart );
         visited.Add(nodes[(0, 0)]);
 
         while (queue.Count > 0)
         {
             CaveNode currentNode = queue.Dequeue();
+
+            if (currentNode.X == target.X && currentNode.Y == target.Y)
+                return currentNode.DistanceFromStart;
 
             for (int i = 0; i < adjacents.Length; i++)
             {
@@ -80,7 +82,7 @@ internal class Day15
                     if (visited.Contains(nextNode)) visited.Remove(nextNode);
 
                     nextNode.DistanceFromStart = distanceToNext;
-                    queue.Enqueue(nextNode);
+                    queue.Enqueue(nextNode, distanceToNext);
                 }
             }
         }
