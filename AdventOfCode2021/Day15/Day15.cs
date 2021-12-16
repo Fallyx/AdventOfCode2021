@@ -1,5 +1,4 @@
-﻿
-namespace AdventOfCode2021.Day15;
+﻿namespace AdventOfCode2021.Day15;
 internal class Day15
 {
     const string inputPath = @"Day15/Input.txt";
