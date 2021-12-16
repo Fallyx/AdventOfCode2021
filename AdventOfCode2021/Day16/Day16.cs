@@ -3,7 +3,6 @@
 internal class Day16
 {
     const string inputPath = @"Day16/Input.txt";
-
     static int versionSum = 0;
 
     public static void Task1()
@@ -18,9 +17,7 @@ internal class Day16
 
         (long value, _) = ParsePacket(binarystring);
         Console.WriteLine($"Task 1: {versionSum}");
-        Console.WriteLine($"value : {value}");
-
-        
+        Console.WriteLine($"Task 2: {value}");
     }
 
     private static (long value, int parsedBits) ParsePacket(string packet)
@@ -32,7 +29,6 @@ internal class Day16
         int typeId = Convert.ToInt32(typeIdStr, 2);
         long value = 0;
         versionSum += version;
-
         i += 6;
 
         if (typeId == 4)
@@ -43,7 +39,7 @@ internal class Day16
         }
         else
         {
-            (long valueReturned, int parsed) = ParseOperator(packet[i..]);
+            (long valueReturned, int parsed) = ParseOperator(packet[i..], typeId);
             value += valueReturned;
             i += parsed;
         }
@@ -71,11 +67,12 @@ internal class Day16
         return (Convert.ToInt64(literalValueStr, 2), i);
     }
 
-    private static (long value, int parsedBits) ParseOperator(string packet)
+    private static (long value, int parsedBits) ParseOperator(string packet, int typeId)
     {
         int i = 0;
         long value = 0;
         string lengthTypeId = packet.Substring(i, 1);
+        List<long> values = new List<long>();
         i++;
         if (lengthTypeId == "0")
         {
@@ -87,7 +84,7 @@ internal class Day16
             while (lenSubPackets - parsedBits >= 11)
             {
                 (long returnedVal, int parsed) =  ParsePacket(subPacketsStr[parsedBits..]);
-                value += returnedVal;
+                values.Add(returnedVal);
                 parsedBits += parsed;
                 i += parsed;
             }
@@ -103,11 +100,26 @@ internal class Day16
             for(int x = 0; x < amountSubPackets; x++)
             {
                 (long returnedVal, int parsed) = ParsePacket(subPacketsStr[parsedBits..]);
-                value += returnedVal;
+                values.Add(returnedVal);
                 parsedBits += parsed;
                 i += parsed;
             }
         }
+
+        if (typeId == 0)
+            value = values.Aggregate(0L, (n1, n2) => n1 + n2);
+        else if (typeId == 1)
+            value = values.Aggregate(1L, (n1, n2) => n1 * n2);
+        else if (typeId == 2)
+            value = values.Min();
+        else if (typeId == 3)
+            value = values.Max();
+        else if (typeId == 5)
+            value = values[0] > values[1] ? 1 : 0;
+        else if (typeId == 6)
+            value = values[0] < values[1] ? 1 : 0;
+        else if (typeId == 7)
+            value = values[0] == values[1] ? 1 : 0;
 
         return (value, i);
     }
