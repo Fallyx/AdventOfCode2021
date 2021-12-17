@@ -5,14 +5,12 @@ internal class Day16
     const string inputPath = @"Day16/Input.txt";
     static int versionSum = 0;
 
-    public static void Task1()
+    public static void Task1and2()
     {
         string hexStr = File.ReadAllLines(inputPath).First();
 
         string binarystring = String.Join(String.Empty,
-          hexStr.Select(
-            c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0')
-          )
+          hexStr.Select(c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0'))
         );
 
         (long value, _) = ParsePacket(binarystring);
