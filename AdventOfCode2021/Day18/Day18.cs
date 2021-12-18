@@ -14,24 +14,46 @@ internal class Day18
 
         Console.WriteLine(snailfishNumber);
 
-        for (int j = 1; j < inputs.Count; j++)
+        
+        for(int j = 1; j < inputs.Count; j++)
         {
             i = 0;
             Pair addition = CreateSnailfishNumber(inputs[j], ref i);
             snailfishNumber = AddSnailfishNumbers(snailfishNumber, addition);
 
             Console.WriteLine(snailfishNumber);
-
+        
             do
             {
                 actionTaken = false;
-                ExplodePair(snailfishNumber);
+                Explode(snailfishNumber);
                 if (!actionTaken)
-                    SplitPair(snailfishNumber);
+                    Split(snailfishNumber);
             } while (actionTaken);
         }
 
+
+        /* for (int j = 1; j < inputs.Count; j++)
+         {
+             i = 0;
+             Pair addition = CreateSnailfishNumber(inputs[j], ref i);
+             snailfishNumber = AddSnailfishNumbers(snailfishNumber, addition);
+
+             Console.WriteLine(snailfishNumber);
+
+             do
+             {
+                 actionTaken = false;
+                 ExplodePair(snailfishNumber);
+                 if (!actionTaken)
+                     SplitPair(snailfishNumber);
+             } while (actionTaken);
+         }*/
+
+        Console.WriteLine();
         Console.WriteLine(snailfishNumber);
+        Console.WriteLine("Should be");
+        Console.WriteLine("[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]");
     }
 
     private static Pair CreateSnailfishNumber(string line, ref int i, int nestedLevel = 1, Pair parent = null)
@@ -40,13 +62,13 @@ internal class Day18
         p.NestedLevel = nestedLevel;
         p.Parent = parent;
         bool isLeft = true;
-        while(i < line.Length)
+        while (i < line.Length)
         {
             i++;
             if (line[i] == ']')
             {
                 break;
-            } 
+            }
             else if (line[i] == '[')
             {
                 if (isLeft)
@@ -61,15 +83,151 @@ internal class Day18
             else
             {
                 if (isLeft)
-                    p.Left = Int32.Parse(line[i].ToString());
+                {
+                    Pair left = new Pair(Int32.Parse(line[i].ToString()), p.NestedLevel + 1);
+                    p.LeftPair = left;
+                    p.LeftPair.Parent = p;
+                }
                 else
-                    p.Right = Int32.Parse(line[i].ToString());
+                {
+                    Pair right = new Pair(Int32.Parse(line[i].ToString()), p.NestedLevel + 1);
+                    p.RightPair = right;
+                    p.RightPair.Parent = p;
+                }
             }
         }
 
         return p;
     }
 
+    private static void Split(Pair p)
+    {
+        if (actionTaken) return;
+        if (p == null) return;
+        if (p.Value != null && p.Value >= 10)
+        {
+            int left = (int)Math.Floor((decimal)(p.Value / (decimal)2));
+            int right = (int)Math.Ceiling((decimal)(p.Value / (decimal)2));
+
+            Pair pairLeft = new Pair(left, p.NestedLevel + 1);
+            pairLeft.Parent = p;
+            Pair pairRight = new Pair(right, p.NestedLevel + 1);
+            pairRight.Parent = p;
+            p.Value = null;
+            p.LeftPair = pairLeft;
+            p.RightPair = pairRight;
+            actionTaken = true;
+        }
+        if (!actionTaken && p.LeftPair != null)
+        {
+            Split(p.LeftPair);
+        }
+        if (!actionTaken && p.RightPair != null)
+        {
+            Split(p.RightPair);
+        }
+    }
+
+    private static void Explode(Pair p)
+    {
+        if (actionTaken) return;
+        if (p.LeftPair == null && p.RightPair == null) return;
+        if (p.NestedLevel > 4)
+        {
+            ExplodeLeft(p.Parent, p, p.LeftPair.Value);
+            ExplodeRight(p.Parent, p, p.RightPair.Value);
+            p.LeftPair = null;
+            p.RightPair = null;
+            p.Value = 0;
+
+            actionTaken = true;
+        }
+        else
+        {
+            if (p.LeftPair != null)
+            {
+                Explode(p.LeftPair);
+            }
+            if (p.RightPair != null)
+            {
+                Explode(p.RightPair);
+            }
+        }
+    }
+
+    private static void ExplodeLeft(Pair p, Pair child, int? number)
+    {
+        if (p == null) return;
+        if (p.LeftPair != null && p.LeftPair.Value != null)
+        {
+            p.LeftPair.Value += number;
+        }
+        else if (p.LeftPair != null && p.LeftPair != child)
+        {
+            ExplodeRightReverse(p.LeftPair, number);
+        }
+        else if (p.LeftPair != null && p.LeftPair == child)
+        {
+
+        }
+        else
+        {
+            ExplodeLeft(p.Parent, p, number);
+        }
+    }
+
+    private static void ExplodeLeftReverse(Pair p, int? number)
+    {
+        if (p == null) return;
+        if (p.Value != null)
+        {
+            p.Value += number;
+        }
+        else if (p.LeftPair != null)
+        {
+            ExplodeLeftReverse(p.LeftPair, number);
+        }
+    }
+
+    private static void ExplodeRight(Pair p, Pair child, int? number)
+    {
+        if (p == null) return;
+        if (p.RightPair != null && p.RightPair.Value != null)
+        {
+            p.RightPair.Value += number;
+        }
+        else if (p.RightPair != null && p.RightPair != child)
+        {
+            ExplodeLeftReverse(p.RightPair, number);
+        }
+        else if (p.LeftPair != null && p.LeftPair == child)
+        {
+            ExplodeRight(p.RightPair, p, number);
+        }
+        else
+        {
+            ExplodeRight(p.Parent, p, number);
+        }
+    }
+
+    private static void ExplodeRightReverse(Pair p, int? number)
+    {
+        if (p == null) return;
+        if (p.RightPair != null && p.RightPair.Value != null)
+        {
+            p.RightPair.Value += number;
+        }
+        else if (p.RightPair != null)
+        {
+            ExplodeRightReverse(p.RightPair, number);
+        }
+        else if (p.LeftPair != null)
+        {
+            ExplodeRightReverse(p.LeftPair, number);
+        }
+    }
+
+/*
     private static void ExplodePair(Pair p)
     {
         if (actionTaken) return;
@@ -138,27 +296,6 @@ internal class Day18
         }
     }
 
-    private static void Explode(Pair? p, int? number, bool isLeft)
-    {
-        if (p == null) return;
-        if (isLeft && p.Left != null)
-        {
-            p.Left += number;
-        }
-        else if (isLeft && p.Parent != null)
-        {
-            Explode(p.Parent, number, isLeft);
-        }
-        else if (!isLeft && p.Right != null)
-        {
-            p.Right += number;
-        }
-        else if (!isLeft && p.Parent != null)
-        {
-            Explode(p.Parent, number, isLeft);
-        }
-    }
-
     private static void ExplodeLeft(Pair? p, int? number)
     {
         if (p == null) return;
@@ -198,7 +335,8 @@ internal class Day18
         }
         else if (p.Parent != null)
         {
-            if (p.Parent.LeftPair != null && p.Parent.LeftPair == p && p.Parent.RightPair != null)
+            if (p.Parent.LeftPair != null && p.Parent.LeftPair == p 
+                && p.Parent.RightPair != null)
             {
                 Console.WriteLine($"ExplodeLeftReverse {p}");
                 ExplodeLeftReverse(p.Parent.RightPair, number);
@@ -209,7 +347,7 @@ internal class Day18
                 ExplodeRight(p.Parent, p, number);
             }
         }
-    }
+    }*/
 
     private static Pair AddSnailfishNumbers(Pair? p1, Pair? p2)
     {
@@ -217,6 +355,7 @@ internal class Day18
         UpdateNestedLevel(p2);
 
         Pair root = new Pair();
+        root.NestedLevel = 1;
         p1.Parent = root;
         p2.Parent = root;
         root.LeftPair = p1;
@@ -241,9 +380,6 @@ internal class Day18
 
     class Pair
     {
-        public int? Left { get; set; }
-        public int? Right { get; set; }
-
         public int? Value { get; set; }
 
         public Pair? LeftPair { get; set; }
@@ -254,10 +390,10 @@ internal class Day18
         public Pair? Parent { get; set; }
 
         public Pair() { }
-        public Pair(int l, int r)
+        public Pair(int v, int nL)
         {
-            Left = l;
-            Right = r;
+            Value = v;
+            NestedLevel = nL;
         }
 
         public override string ToString()
