@@ -6,7 +6,7 @@ internal class Day17
 {
     const string inputPath = @"Day17/Input.txt";
 
-    public static void Task1()
+    public static void Task1and2()
     {
         string input = File.ReadAllLines(inputPath).First();
         HashSet<(int x, int y)> initialVectors = new HashSet<(int x, int y)>();
