@@ -10,41 +10,28 @@ internal class Day18
         List<string> inputs = File.ReadAllLines(inputPath).ToList();
 
         int i = 0;
-        Pair p = CreateSnailfishNumber(inputs.First(), ref i);
+        Pair snailfishNumber = CreateSnailfishNumber(inputs.First(), ref i);
 
-        bool fullyReduced = false;
-        do
+        Console.WriteLine(snailfishNumber);
+
+        for (int j = 1; j < inputs.Count; j++)
         {
-            actionTaken = false;
-            bool didExplode = true;
-            while (didExplode)
-                didExplode = ExplodePair(p);
-            bool didSplit = true;
-            if (!actionTaken)
+            i = 0;
+            Pair addition = CreateSnailfishNumber(inputs[j], ref i);
+            snailfishNumber = AddSnailfishNumbers(snailfishNumber, addition);
+
+            Console.WriteLine(snailfishNumber);
+
+            do
             {
-                
-                while (didSplit)
-                    didSplit = SplitPair(p);
-            }
-            fullyReduced = !didExplode && !didSplit;
-        } while (actionTaken && !fullyReduced);
+                actionTaken = false;
+                ExplodePair(snailfishNumber);
+                if (!actionTaken)
+                    SplitPair(snailfishNumber);
+            } while (actionTaken);
+        }
 
-        /*bool fullyReduced = false;
-
-        while(!fullyReduced)
-        {
-            bool didExplode = true;
-            while (didExplode)
-                didExplode = ExplodePair(p);
-
-            bool didSplit = true;
-            while (didSplit)
-                didSplit = SplitPair(p);
-
-            fullyReduced = !didExplode && !didSplit;
-        }*/
-
-        Console.WriteLine(p);
+        Console.WriteLine(snailfishNumber);
     }
 
     private static Pair CreateSnailfishNumber(string line, ref int i, int nestedLevel = 1, Pair parent = null)
@@ -83,12 +70,13 @@ internal class Day18
         return p;
     }
 
-    private static bool ExplodePair(Pair p)
+    private static void ExplodePair(Pair p)
     {
+        if (actionTaken) return;
         if (p.NestedLevel > 4)
         { 
             ExplodeLeft(p.Parent, p.Left);
-            ExplodeRight(p.Parent, p.Right);
+            ExplodeRight(p.Parent, p, p.Right);
 
             if (p.Parent.LeftPair == p)
             {
@@ -102,25 +90,20 @@ internal class Day18
             }
 
             actionTaken = true;
-            return true;
         }
         else
         {
-            bool didExplode = false;
             if (p.LeftPair != null)
-                didExplode = ExplodePair(p.LeftPair);
-            if (!didExplode && p.RightPair != null)
-                didExplode = ExplodePair(p.RightPair);
-
-            return didExplode;
+                ExplodePair(p.LeftPair);
+            if (!actionTaken && p.RightPair != null)
+                ExplodePair(p.RightPair);
         }
     }
 
-    private static bool SplitPair(Pair p)
+    private static void SplitPair(Pair p)
     {
-        bool didSplitLeft = false;
-        bool didSplitRight = false;
-        if (p == null) return false;
+        if (actionTaken) return;
+        if (p == null) return;
         if (p.Left != null && p.Left >= 10)
         {
             int left = (int)Math.Floor((decimal)(p.Left / (decimal)2));
@@ -128,33 +111,31 @@ internal class Day18
 
             Pair newP = new Pair(left, right);
             newP.NestedLevel = p.NestedLevel + 1;
+            newP.Parent = p;
             p.Left = null;
             p.LeftPair = newP;
             actionTaken = true;
-            didSplitLeft = true;
         }
         else if (p.LeftPair != null)
         {
-            didSplitLeft = SplitPair(p.LeftPair);
+            SplitPair(p.LeftPair);
         }
-        if (p.Right != null && p.Right >= 10)
+        if (!actionTaken && p.Right != null && p.Right >= 10)
         {
             int left = (int)Math.Floor((decimal)(p.Right / (decimal)2));
             int right = (int)Math.Ceiling((decimal)(p.Right / (decimal)2));
 
             Pair newP = new Pair(left, right);
             newP.NestedLevel = p.NestedLevel + 1;
+            newP.Parent = p;
             p.Right = null;
             p.RightPair = newP;
             actionTaken = true;
-            didSplitRight = true;
         }
-        else if (p.RightPair != null)
+        else if (!actionTaken && p.RightPair != null)
         {
-            didSplitRight = SplitPair(p.RightPair);
+            SplitPair(p.RightPair);
         }
-
-        return didSplitLeft || didSplitRight;
     }
 
     private static void Explode(Pair? p, int? number, bool isLeft)
@@ -200,27 +181,61 @@ internal class Day18
         }
         else if (p.LeftPair != null)
         {
-            ExplodeLeft(p.LeftPair, number);
+            ExplodeLeftReverse(p.LeftPair, number);
         }
     }
 
-    private static void ExplodeRight(Pair? p, int? number)
+    private static void ExplodeRight(Pair? p, Pair? child, int? number)
     {
         if (p == null) return;
         if (p.Right != null)
         {
             p.Right += number;
         }
+        else if (p.LeftPair == child && p.RightPair != null)
+        {
+            ExplodeLeftReverse(p.RightPair, number);
+        }
         else if (p.Parent != null)
         {
             if (p.Parent.LeftPair != null && p.Parent.LeftPair == p && p.Parent.RightPair != null)
             {
+                Console.WriteLine($"ExplodeLeftReverse {p}");
                 ExplodeLeftReverse(p.Parent.RightPair, number);
             }
             else if (p.Parent.RightPair != null && p.Parent.RightPair == p)
             {
-                ExplodeRight(p.Parent, number);
+                Console.WriteLine($"ExplodeRight again: {p}");
+                ExplodeRight(p.Parent, p, number);
             }
+        }
+    }
+
+    private static Pair AddSnailfishNumbers(Pair? p1, Pair? p2)
+    {
+        UpdateNestedLevel(p1);
+        UpdateNestedLevel(p2);
+
+        Pair root = new Pair();
+        p1.Parent = root;
+        p2.Parent = root;
+        root.LeftPair = p1;
+        root.RightPair = p2;
+
+        return root;
+    }
+
+    private static void UpdateNestedLevel(Pair? p)
+    {
+        if (p == null) return;
+        p.NestedLevel++;
+        if (p.LeftPair != null)
+        {
+            UpdateNestedLevel(p.LeftPair);
+        }
+        if (p.RightPair != null)
+        {
+            UpdateNestedLevel(p.RightPair);
         }
     }
 
@@ -228,6 +243,8 @@ internal class Day18
     {
         public int? Left { get; set; }
         public int? Right { get; set; }
+
+        public int? Value { get; set; }
 
         public Pair? LeftPair { get; set; }
         public Pair? RightPair { get; set; }
@@ -245,7 +262,12 @@ internal class Day18
 
         public override string ToString()
         {
-            return $"[{(Left != null ? Left.ToString() : LeftPair.ToString())},{(Right != null ? Right.ToString() : RightPair.ToString())}]";
+            if (Value != null)
+            {
+                return Value.ToString();
+            }
+
+            return $"[{LeftPair.ToString()},{RightPair.ToString()}]";
         }
     }
 }
