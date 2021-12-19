@@ -15,7 +15,29 @@ internal class Day18
             snailfishNumber = Reduce(snailfishNumber);
         }
 
-        Console.WriteLine(Magnitude(snailfishNumber));
+        Console.WriteLine($"Task 1: {Magnitude(snailfishNumber)}");
+    }
+
+    public static void Task2()
+    {
+        List<string> inputs = File.ReadAllLines(inputPath).ToList();
+        int largestMagnitude = 0;
+
+        for(int left = 0; left < inputs.Count; left++)
+        {
+            for(int right = 0; right < inputs.Count; right++)
+            {
+                if (left == right) continue;
+
+                string snailfishNumber = AddSnailfishNumber(inputs[left], inputs[right]);
+                snailfishNumber = Reduce(snailfishNumber);
+
+                int magnitude = Int32.Parse(Magnitude(snailfishNumber));
+                if (largestMagnitude < magnitude) largestMagnitude = magnitude;
+            }
+        }
+
+        Console.WriteLine($"Task 2: {largestMagnitude}");
     }
 
     private static string Magnitude(string line)
