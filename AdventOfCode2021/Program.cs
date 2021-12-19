@@ -96,7 +96,6 @@ class Program
                 break;
             case 18:
                 Day18.Day18.Task1();
-                //Day18.Day18_2.Task1();
                 break;
             default:
                 break;
