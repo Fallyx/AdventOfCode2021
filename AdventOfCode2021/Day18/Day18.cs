@@ -2,7 +2,6 @@
 internal class Day18
 {
     const string inputPath = @"Day18/Input.txt";
-    public static int explodeCounter = 0;
 
     public static void Task1()
     {

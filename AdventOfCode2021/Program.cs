@@ -98,6 +98,10 @@ class Program
                 Day18.Day18.Task1();
                 Day18.Day18.Task2();
                 break;
+            case 20:
+                Day20.Day20.Task1();
+                Day20.Day20.Task2();
+                break;
             default:
                 break;
         }
